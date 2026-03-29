@@ -1,118 +1,113 @@
-# PawPal+ Project Reflection
+PawPal+ Project Reflection
+1. System Design
 
-## 1. System Design
+a. Initial design
 
-**a. Initial design**
+For PawPal+, I initially designed four main classes to model the system: Owner, Pet, Task, and Scheduler. These classes capture the core objects and responsibilities of the pet care management system.
 
-- Briefly describe your initial UML design.
-For PawPal+, I designed four main classes.
+Core user actions
 
-**Core user actions**
-1. Add a new pet to their profile.
-2. Schedule a task for a pet (walk, feeding, medication, vet appointment).
-3. View and manage today's tasks, including marking tasks as done.
+Add a new pet to their profile.
+Schedules tasks for pets (walks, feedings, medications, vet appointments).
+Views and manages today’s tasks, including marking tasks as done.
 
-### Classes
+Classes and Responsibilities
 
-1. **Owner**
-   - **Attributes**
-     - `name`: string
-     - `email`: string
-     - `pets`: list of Pet objects
-   - **Methods / Responsibilities**
-     - `add_pet(pet)`: adds a new pet to the owner
-     - `remove_pet(pet)`: removes a pet from the owner
+Owner
+Attributes: name, email, pets (list of Pet objects)
+Methods:
+add_pet(pet): Add a pet to the owner’s profile.
+remove_pet(pet): Remove a pet from the owner.
+get_all_tasks(): Retrieve all tasks across all pets.
+Pet Attributes: name, species, age, tasks (list of Task objects)
+Methods:
+add_task(task): Assign a task to the pet.
+remove_task(task): Remove a task from the pet.
+Task
+Attributes: task_type, time, priority, recurrence, done
+Methods:
+mark_done(): Mark the task as completed.
+is_conflict_with(other_task): Check if two tasks overlap in time.
+get_occurrence_for_date(target_date): Return a task occurrence for a specific date, accounting for recurrence.
+Scheduler
+Attributes: task_list (all tasks across pets)
+Methods:
+load_tasks_from_owner(owner): Load tasks from an owner’s pets.
+sort_tasks(): Sort tasks by time, then by priority.
+detect_conflicts(): Identify conflicting tasks (tasks at the same time).
+get_today_tasks(): Retrieve tasks scheduled for today.
+complete_task(task): Mark a task complete and handle recurrence.
+filter_by_status(done): Filter tasks by completion status.
 
-2. **Pet**
-   - **Attributes**
-     - `name`: string
-     - `species`: string
-     - `age`: integer
-     - `tasks`: list of Task objects
-   - **Methods / Responsibilities**
-     - `add_task(task)`: adds a new task to the pet
-     - `remove_task(task)`: removes a task from the pet
+b. Design changes
 
-3. **Task**
-   - **Attributes**
-     - `task_type`: string (walk, feed, medication)
-     - `time`: datetime
-     - `priority`: integer
-     - `recurrence`: string or None
-     - `done`: boolean
-   - **Methods / Responsibilities**
-     - `mark_done()`: marks the task as completed
-     - `is_conflict_with(other_task)`: checks if this task conflicts with another
+During implementation, I refined how recurring tasks were handled. Initially, I considered storing all occurrences explicitly, but this would have required duplicating tasks for future dates. Instead, I implemented a dynamic recurrence system in get_occurrence_for_date() and complete_task(), which generates the next occurrence only when a task is completed. This reduces memory usage and makes scheduling more flexible.
 
-4. **Scheduler**
-   - **Attributes**
-     - `task_list`: list of all tasks across pets
-   - **Methods / Responsibilities**
-     - `sort_tasks()`: sorts tasks by time or priority
-     - `detect_conflicts()`: finds conflicting tasks
-     - `get_today_tasks()`: returns tasks scheduled for today
+2. Scheduling Logic and Tradeoffs
 
-- What classes did you include, and what responsibilities did you assign to each?
+a. Constraints and priorities
 
-**b. Design changes**
+The scheduler considers the following constraints:
 
-- Did your design change during implementation?
-- If yes, describe at least one change and why you made it.
+Time: Tasks are ordered chronologically.
+Priority: Higher priority tasks appear first if times are equal.
+Recurrence: Daily and weekly tasks automatically reappear after completion.
+Conflict avoidance: Tasks with identical timestamps are flagged.
 
----
+I prioritized time first, because a pet owner needs a clear chronological plan, and priority second to ensure urgent tasks are emphasized.
 
-## 2. Scheduling Logic and Tradeoffs
+b. Tradeoffs
 
-**a. Constraints and priorities**
+The scheduler only checks for exact time matches to detect conflicts, rather than overlapping durations. This simplifies the algorithm and is reasonable for this scenario because PawPal+ tasks are short, discrete events (walks, feedings, medications), so exact-time conflicts capture the majority of scheduling issues without overcomplicating the logic.
 
-- What constraints does your scheduler consider (for example: time, priority, preferences)?
-- How did you decide which constraints mattered most?
+3. AI Collaboration
 
-**b. Tradeoffs**
+a. How I used AI
 
-- Describe one tradeoff your scheduler makes.
-- Why is that tradeoff reasonable for this scenario?
+AI was used for:
 
----
+Brainstorming UML diagrams and validating class relationships.
+Generating initial Python class skeletons with dataclasses.
+Suggesting algorithms for sorting, filtering, recurrence handling, and conflict detection.
+Drafting automated test functions to cover edge cases.
 
-## 3. AI Collaboration
+Prompts that worked best included asking AI to translate UML into Python classes, implement recurrence logic with timedelta, and generate pytest test cases.
 
-**a. How you used AI**
+b. Judgment and verification
 
-- How did you use AI tools during this project (for example: design brainstorming, debugging, refactoring)?
-- What kinds of prompts or questions were most helpful?
+I did not accept AI suggestions blindly. For example, AI initially suggested a recurrence system that created all future occurrences at once, which could overwhelm memory for long-term schedules. I evaluated this by reasoning about task volume and verifying with small tests, then implemented a dynamic generation approach instead.
 
-**b. Judgment and verification**
+4. Testing and Verification
 
-- Describe one moment where you did not accept an AI suggestion as-is.
-- How did you evaluate or verify what the AI suggested?
+a. What you tested
 
----
+Task completion: mark_done() correctly updates task status.
+Task addition/removal: Pets correctly store their tasks.
+Sorting correctness: Tasks are returned in chronological order, with priority as a tie-breaker.
+Recurrence logic: Daily and weekly tasks generate a new occurrence after completion.
+Conflict detection: Scheduler flags tasks with the same timestamp.
+Edge cases: Pets with no tasks, no conflicts, and filtering tasks by completion status.
 
-## 4. Testing and Verification
+These tests were crucial to ensure the scheduler produced accurate daily plans, correctly handled recurring tasks, and flagged conflicts.
 
-**a. What you tested**
+b. Confidence
 
-- What behaviors did you test?
-- Why were these tests important?
+I am confident the scheduler works correctly for the tested scenarios. If I had more time, I would test:
 
-**b. Confidence**
+Overlapping durations: Tasks that span multiple hours.
+Time zone changes or DST adjustments.
+Simultaneous recurrence across multiple pets.
 
-- How confident are you that your scheduler works correctly?
-- What edge cases would you test next if you had more time?
+5. Reflection
 
----
+a. What went well
 
-## 5. Reflection
+I am most satisfied with the dynamic recurrence system and conflict detection, which allow PawPal+ to handle daily and weekly tasks intuitively while keeping the scheduler lightweight and efficient. The CLI-first workflow helped me validate all logic before integrating with Streamlit.
 
-**a. What went well**
+b. What you would improve
 
-- What part of this project are you most satisfied with?
+Next iteration, I would redesign the scheduler to handle task durations, allowing it to detect overlapping tasks more realistically. I would also add user preferences for task order (e.g., morning vs. evening) to improve the daily plan’s usability.
 
-**b. What you would improve**
+c. Key takeaway
 
-- If you had another iteration, what would you improve or redesign?
-
-**c. Key takeaway**
-
-- What is one important thing you learned about designing systems or working with AI on this project?
+The most important lesson was that AI is a powerful collaborator, but human judgment is essential. I learned to use AI to accelerate brainstorming, scaffolding, and testing while verifying that the resulting logic aligns with real-world constraints and user needs. 

@@ -41,3 +41,58 @@ pip install -r requirements.txt
 5. Add tests to verify key behaviors.
 6. Connect your logic to the Streamlit UI in `app.py`.
 7. Refine UML so it matches what you actually built.
+
+
+PawPal+ 🐾
+
+PawPal+ is a smart pet care management system that helps busy pet owners plan, organize, and track care tasks for their pets. It ensures pets stay happy, healthy, and on schedule.
+
+Features
+Add owners and pets
+Add, edit, and track pet care tasks (walks, feeding, medication, grooming, enrichment, etc.)
+Assign priorities and durations to tasks
+Recurring tasks: daily or weekly scheduling
+Generate a daily plan based on priorities and constraints
+Detect conflicts if two tasks overlap in time
+Sort tasks by time and priority
+Filter tasks by completion status
+Streamlit UI for a simple, interactive experience
+CLI-first workflow for testing and debugging
+Automated test suite to verify key behaviors
+
+
+Project Structure
+pawpal/
+│
+├─ pawpal_system.py      # Core classes: Task, Pet, Owner, Scheduler
+├─ main.py               # CLI demo and testing
+├─ app.py                # Streamlit UI
+├─ tests/
+│   └─ test_pawpal.py    # Automated test suite
+├─ uml_final.png          # Final UML diagram
+├─ requirements.txt
+└─ README.md
+
+Testing PawPal+
+
+Runs all automated tests to verify the system behaves correctly:
+
+python -m pytest
+
+
+Smarter Scheduling Section from Phase 4:
+
+
+Tasks are sorted by time and priority
+Daily and weekly recurring tasks automatically reappear after completion
+Conflict detection warns the user about overlapping tasks
+Filter tasks by completion status for a clean view
+
+
+
+Screenshots:
+
+My Streamlit app in action:
+
+![App Screenshot](./images/app_screenshot.png)
+![Final UML Diagram](./images/uml_final.png)
