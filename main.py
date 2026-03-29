@@ -1,0 +1,51 @@
+from datetime import datetime, timedelta
+from pawpal_system import Task, Pet, Owner, Scheduler
+
+# Create owner and pets
+owner = Owner("Alice", "alice@example.com")
+pet1 = Pet("Buddy", "Dog", 5)
+pet2 = Pet("Whiskers", "Cat", 3)
+owner.add_pet(pet1)
+owner.add_pet(pet2)
+
+# Create tasks
+task1 = Task("walk", datetime.now() + timedelta(hours=2), 2)
+task2 = Task("feed", datetime.now() + timedelta(minutes=30), 3)
+task3 = Task("medication", datetime.now() + timedelta(hours=1), 1)
+conflict_task = Task("vet visit", task2.time, 2)  # conflicts with feed
+daily_task = Task("daily feeding", datetime.now(), 3, recurrence="daily")
+
+# Assign tasks to pets
+pet1.add_task(task1)
+pet1.add_task(task2)
+pet1.add_task(daily_task)
+pet2.add_task(task3)
+pet2.add_task(conflict_task)
+
+# Load scheduler
+scheduler = Scheduler()
+scheduler.load_tasks_from_owner(owner)
+scheduler.sort_tasks()
+
+# Function to print schedule
+def print_schedule():
+    print("=== Today's Schedule ===")
+    for task in scheduler.get_today_tasks():
+        status = "✅ Done" if task.done else "❌ Not Done"
+        rec = f"({task.recurrence})" if task.recurrence else ""
+        print(f"{task.time.strftime('%H:%M')} | {task.task_type.upper():<12} {rec:<10} | Priority: {task.priority} | {status}")
+
+# Print schedule & conflicts
+print_schedule()
+conflicts = scheduler.detect_conflicts()
+if conflicts:
+    print("\n⚠️ Conflicting Tasks Detected:")
+    for t1, t2 in conflicts:
+        print(f"{t1.task_type} at {t1.time.strftime('%H:%M')} conflicts with {t2.task_type} at {t2.time.strftime('%H:%M')}")
+else:
+    print("\nNo conflicts detected!")
+
+# Complete first task and print updated schedule
+print("\nMarking first task as done...\n")
+scheduler.complete_task(scheduler.task_list[0])
+print_schedule()

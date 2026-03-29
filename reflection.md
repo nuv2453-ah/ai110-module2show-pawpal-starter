@@ -5,6 +5,53 @@
 **a. Initial design**
 
 - Briefly describe your initial UML design.
+For PawPal+, I designed four main classes.
+
+**Core user actions**
+1. Add a new pet to their profile.
+2. Schedule a task for a pet (walk, feeding, medication, vet appointment).
+3. View and manage today's tasks, including marking tasks as done.
+
+### Classes
+
+1. **Owner**
+   - **Attributes**
+     - `name`: string
+     - `email`: string
+     - `pets`: list of Pet objects
+   - **Methods / Responsibilities**
+     - `add_pet(pet)`: adds a new pet to the owner
+     - `remove_pet(pet)`: removes a pet from the owner
+
+2. **Pet**
+   - **Attributes**
+     - `name`: string
+     - `species`: string
+     - `age`: integer
+     - `tasks`: list of Task objects
+   - **Methods / Responsibilities**
+     - `add_task(task)`: adds a new task to the pet
+     - `remove_task(task)`: removes a task from the pet
+
+3. **Task**
+   - **Attributes**
+     - `task_type`: string (walk, feed, medication)
+     - `time`: datetime
+     - `priority`: integer
+     - `recurrence`: string or None
+     - `done`: boolean
+   - **Methods / Responsibilities**
+     - `mark_done()`: marks the task as completed
+     - `is_conflict_with(other_task)`: checks if this task conflicts with another
+
+4. **Scheduler**
+   - **Attributes**
+     - `task_list`: list of all tasks across pets
+   - **Methods / Responsibilities**
+     - `sort_tasks()`: sorts tasks by time or priority
+     - `detect_conflicts()`: finds conflicting tasks
+     - `get_today_tasks()`: returns tasks scheduled for today
+
 - What classes did you include, and what responsibilities did you assign to each?
 
 **b. Design changes**
